@@ -28,7 +28,7 @@ if (( $EUID != 0 )); then
 fi
 
 # if locale is already present in environment, then add 'recovery' option
-if grep -q "$ locale" /etc/environment ; then
+if grep -q "XKB_DEFAULT_LAYOUT" /etc/environment ; then
     OPTION=$(zen_nospam --title="Adding a locale" --width=350 --height=200 --list --radiolist --text "The locale is already added\nSelect Option:" --hide-header --column "Buttons" --column "Choice"\
     TRUE "Recovery system file" \
     )
@@ -74,15 +74,15 @@ fi
 
 if [[ "$OPTION" == "Russian" ]]; then
   (
-  # Select layout
-if  OPTION=$(zen_nospam --title="Select layout" --width=350 --height=350 --list --radiolist --text "Select language to install:" --hide-header --column "Buttons" --column "Choice"\
-    TRUE "shift+ctrl" \
-    FALSE "shift+alt" \
-    )
-fi
   echo "Backup environment..."
   sudo cp /etc/environment /etc/environment.bak
   
+  # Select layout
+if  OPTION=$(zen_nospam --title="Layout switching option" --width=350 --height=350 --list --radiolist --text "Select the option to switch the layout:" --hide-header --column "Buttons" --column "Choice"\
+    TRUE "shift+ctrl" \
+    FALSE "shift+alt" \
+    )
+fi  
   if [[ "$OPTION" == "shift+ctrl" ]]; then
   # Select shift+ctrl
   echo "Adding parameter in environment..."
@@ -93,7 +93,7 @@ fi
   sudo sed -i '5 a\XKB_DEFAULT_LAYOUT=ru,us\nXKB_DEFAULT_OPTIONS=grp:lalt_lshift_toggle\n' /etc/environment
   
   # Reboot/Later
-  if grep -q "$ locale" /etc/environment ; then
+  if grep -q "XKB_DEFAULT_LAYOUT" /etc/environment ; then
       OPTION=$(zen_nospam --title="Adding a locale" --width=350 --height=100 --list --radiolist --text "Reboot system:" --hide-header --column "Buttons" --column "Choice"\
       TRUE "Reboot now" \
       FALSE "Reboot later"
